@@ -24,10 +24,8 @@ from sqlalchemy.sql.compiler import SQLCompiler
 from pyhive import hive
 from pyhive.common import UniversalSet
 from dateutil.parser import parse
-from . import pyhive_struct as struct
-from struct import _struct
 from decimal import Decimal
-
+from pyhive._struct import STRUCT
 
 class HiveStringTypeBase(types.TypeDecorator):
     """Translates strings returned by Thrift into something else"""

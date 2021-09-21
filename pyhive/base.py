@@ -54,7 +54,7 @@ from sqlalchemy.sql import elements, selectable
 import re
 
 from .parse_url import parse_url
-from . import _helpers, _struct, _types
+from . import _types, _struct, _helpers
 
 FIELD_ILLEGAL_CHARACTERS = re.compile(r"[^\w]+")
 

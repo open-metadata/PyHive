@@ -8,6 +8,10 @@ TCLIService/__init__.py
 TCLIService/constants.py
 TCLIService/ttypes.py
 pyhive/__init__.py
+pyhive/_helpers.py
+pyhive/_struct.py
+pyhive/_types.py
+pyhive/base.py
 pyhive/common.py
 pyhive/exc.py
 pyhive/hive.py

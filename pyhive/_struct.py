@@ -24,7 +24,7 @@ import sqlalchemy.sql.default_comparator
 import sqlalchemy.sql.sqltypes
 import sqlalchemy.types
 
-from . import base
+from pyhive import base
 
 sqlalchemy_1_4_or_more = packaging.version.parse(
     sqlalchemy.__version__
