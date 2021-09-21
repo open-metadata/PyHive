@@ -21,11 +21,11 @@ from sqlalchemy.databases import mysql
 from sqlalchemy.engine import default
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.compiler import SQLCompiler
-
 from pyhive import hive
 from pyhive.common import UniversalSet
-
 from dateutil.parser import parse
+from . import pyhive_struct as struct
+from struct import _struct
 from decimal import Decimal
 
 
@@ -135,7 +135,7 @@ _type_map = {
     'binary': types.String,
     'array': types.String,
     'map': types.String,
-    'struct': types.String,
+    'struct': Struct,
     'uniontype': types.String,
     'decimal': HiveDecimal,
 }
