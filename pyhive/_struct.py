@@ -23,8 +23,8 @@ import packaging.version
 import sqlalchemy.sql.default_comparator
 import sqlalchemy.sql.sqltypes
 import sqlalchemy.types
+from sqlalchemy.sql import compiler
 
-from pyhive import base
 
 sqlalchemy_1_4_or_more = packaging.version.parse(
     sqlalchemy.__version__
@@ -38,10 +38,44 @@ if sqlalchemy_1_4_or_more:
 def _get_subtype_col_spec(type_):
     global _get_subtype_col_spec
 
-    type_compiler = base.dialect.type_compiler(base.dialect())
+    type_compiler = HiveTypeCompiler
     _get_subtype_col_spec = type_compiler.process
     return _get_subtype_col_spec(type_)
 
+
+class HiveTypeCompiler(compiler.GenericTypeCompiler):
+    def visit_INTEGER(self, type_):
+        return 'INT'
+
+    def visit_NUMERIC(self, type_):
+        return 'DECIMAL'
+
+    def visit_CHAR(self, type_):
+        return 'STRING'
+
+    def visit_VARCHAR(self, type_):
+        return 'STRING'
+
+    def visit_NCHAR(self, type_):
+        return 'STRING'
+
+    def visit_TEXT(self, type_):
+        return 'STRING'
+
+    def visit_CLOB(self, type_):
+        return 'STRING'
+
+    def visit_BLOB(self, type_):
+        return 'BINARY'
+
+    def visit_TIME(self, type_):
+        return 'TIMESTAMP'
+
+    def visit_DATE(self, type_):
+        return 'TIMESTAMP'
+
+    def visit_DATETIME(self, type_):
+        return 'TIMESTAMP'
 
 class STRUCT(sqlalchemy.sql.sqltypes.Indexable, sqlalchemy.types.UserDefinedType):
     """

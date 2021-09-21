@@ -12,6 +12,7 @@ import datetime
 import decimal
 
 import re
+import sqlalchemy
 from sqlalchemy import exc
 from sqlalchemy import processors
 from sqlalchemy import types
@@ -133,7 +134,7 @@ _type_map = {
     'binary': types.String,
     'array': types.String,
     'map': types.String,
-    'struct': Struct,
+    'struct': STRUCT,
     'uniontype': types.String,
     'decimal': HiveDecimal,
 }
@@ -314,12 +315,8 @@ class HiveDialect(default.DefaultDialect):
             # Take out the more detailed type information
             # e.g. 'map<int,int>' -> 'map'
             #      'decimal(10,1)' -> decimal
-            col_type = re.search(r'^\w+', col_type).group(0)
-            try:
-                coltype = _type_map[col_type]
-            except KeyError:
-                util.warn("Did not recognize type '%s' of column '%s'" % (col_type, col_name))
-                coltype = types.NullType
+            coltype = self._get_sqla_column_type(col_type, col_name)
+
 
             result.append({
                 'name': col_name,
@@ -328,6 +325,28 @@ class HiveDialect(default.DefaultDialect):
                 'default': None,
             })
         return result
+
+    def _get_sqla_column_type(self, col_type, col_name):
+        try:
+            coltype = _type_map[col_type]
+        except KeyError:
+            sqlalchemy.util.warn(
+                "Did not recognize type '%s' of column '%s'"
+                % (col_type, col_name)
+            )
+            coltype = sqlalchemy.types.NullType
+        else:
+            if col_type == "RECORD" or col_type == "STRUCT":
+                coltype = STRUCT(
+                    *(
+                        (subfield.name, _get_sqla_column_type(col_type))
+                        for subfield in field.fields
+                    )
+                )
+            else:
+                coltype = coltype()
+
+        return coltype
 
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
         # Hive has no support for foreign keys.
