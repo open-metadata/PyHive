@@ -247,6 +247,7 @@ class HiveDialect(default.DefaultDialect):
     supports_multivalues_insert = True
     type_compiler = HiveTypeCompiler
     supports_sane_rowcount = False
+    complex_data_types = ['struct', 'map', 'array', 'union']
 
     @classmethod
     def dbapi(cls):
@@ -316,6 +317,7 @@ class HiveDialect(default.DefaultDialect):
             # Take out the more detailed type information
             # e.g. 'map<int,int>' -> 'map'
             #      'decimal(10,1)' -> decimal
+            col_raw_type = col_type
             col_type = re.search(r'^\w+', col_type).group(0)
             try:
                 coltype = _type_map[col_type]
@@ -328,6 +330,7 @@ class HiveDialect(default.DefaultDialect):
                 'type': coltype,
                 'nullable': True,
                 'default': None,
+                'raw_data_type': col_raw_type if col_type in self.complex_data_types else None
             })
         return result
 
